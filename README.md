@@ -20,6 +20,18 @@ Get a TLS certificate suitable for `localhost`, `127.0.0.1`, etc:
 cert, err := insecure.Cert()
 ```
 
+Get a TLS certificate for a specific set of [subject alternative names](https://en.wikipedia.org/wiki/Subject_Alternative_Name):
+
+```go
+cert, err := insecure.Cert("crowbar.local", "::1", "192.168.0.42")
+```
+
+Get a certificate pool that trusts `cert`, useful for building `net/http` clients that call other services using `cert`:
+
+```go
+pool, err := insecure.Pool(cert)
+```
+
 ## Note
 
 Seriously, do not use this in production.
