@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 func TestPEM(t *testing.T) {
@@ -112,5 +113,48 @@ func TestServeCert(t *testing.T) {
 	}
 	if s := string(b); s != "OK" {
 		t.Fatal(err)
+	}
+}
+
+func TestNotBeforeOrAfter(t *testing.T) {
+	// https://en.wikipedia.org/wiki/UTC%E2%88%9212:00
+	idlw := time.FixedZone("UTC-12", -12*60*60)
+	nz := time.FixedZone("UTC+12", 12*60*60)
+	to := time.FixedZone("UTC+13", 13*60*60)
+	hi := time.FixedZone("UTC-10", -10*60*60)
+	tests := []time.Time{
+		time.Now(),
+		time.Now().UTC(),
+		time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+		time.Date(2020, 12, 31, 0, 0, 0, 0, time.UTC),
+		time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+		time.Date(2021, 12, 31, 0, 0, 0, 0, time.UTC),
+		time.Date(2020, 1, 1, 0, 0, 0, 0, idlw),
+		time.Date(2020, 12, 31, 0, 0, 0, 0, idlw),
+		time.Date(2021, 1, 1, 0, 0, 0, 0, idlw),
+		time.Date(2021, 12, 31, 0, 0, 0, 0, idlw),
+		time.Date(2020, 1, 1, 0, 0, 0, 0, nz),
+		time.Date(2020, 12, 31, 0, 0, 0, 0, nz),
+		time.Date(2021, 1, 1, 0, 0, 0, 0, nz),
+		time.Date(2021, 12, 31, 0, 0, 0, 0, nz),
+		time.Date(2020, 1, 1, 0, 0, 0, 0, to),
+		time.Date(2020, 12, 31, 0, 0, 0, 0, to),
+		time.Date(2021, 1, 1, 0, 0, 0, 0, to),
+		time.Date(2021, 12, 31, 0, 0, 0, 0, to),
+		time.Date(2020, 1, 1, 0, 0, 0, 0, hi),
+		time.Date(2020, 12, 31, 0, 0, 0, 0, hi),
+		time.Date(2021, 1, 1, 0, 0, 0, 0, hi),
+		time.Date(2021, 12, 31, 0, 0, 0, 0, hi),
+	}
+	for _, tt := range tests {
+		t.Run(tt.Format(time.RFC3339), func(t *testing.T) {
+			notBefore, notAfter := notBeforeOrAfter(tt)
+			if tt.Before(notBefore) {
+				t.Errorf("time is before notBefore (%v)", notBefore.Format(time.RFC3339))
+			}
+			if tt.After(notAfter) {
+				t.Errorf("time is after notAfter (%v)", notAfter.Format(time.RFC3339))
+			}
+		})
 	}
 }

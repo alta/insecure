@@ -113,7 +113,7 @@ var localSANs = []string{"127.0.0.1", "::1", "localhost"}
 // and add 398 days to get the end date. The current time (now) should always
 // fall between the two dates.
 func notBeforeOrAfter(now time.Time) (time.Time, time.Time) {
-	notBefore := time.Date(time.Now().UTC().Year(), 1, 1, 0, 0, 0, 0, time.UTC)
+	notBefore := time.Date(now.UTC().Year(), 1, 1, 0, 0, 0, 0, time.UTC)
 	notAfter := notBefore.Add(398 * 24 * time.Hour)
 	return notBefore, notAfter
 }
