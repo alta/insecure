@@ -31,9 +31,8 @@ func Pool(cert tls.Certificate) (*x509.CertPool, error) {
 }
 
 // Cert returns a deterministic self-signed certificate and private key for the
-// specified organization and list of SANs. If the organiation name is
-// unspecified, a default value will be used. If SANs are not specified, a
-// default set of local SANs will be used.
+// specified list of SANs. If SANs are not specified, a default set of local SANs
+// will be used.
 func Cert(sans ...string) (tls.Certificate, error) {
 	cert, key, err := PEM(sans...)
 	if err != nil {
@@ -43,9 +42,8 @@ func Cert(sans ...string) (tls.Certificate, error) {
 }
 
 // PEM returns a self-signed certificate and private key in PEM format for the
-// specified organization and list of SANs. If the organiation name is
-// unspecified, a default value will be used. If SANs are not specified, a
-// default set of local SANs will be used.
+// specified list of SANs. If SANs are not specified, a default set of local SANs
+// will be used.
 func PEM(sans ...string) (cert []byte, key []byte, err error) {
 	priv, err := Key()
 	if err != nil {
