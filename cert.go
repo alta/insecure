@@ -67,6 +67,7 @@ func PEM(sans ...string) (cert []byte, key []byte, err error) {
 	if len(sans) == 0 {
 		sans = LocalSANs()
 	}
+	sans = sortUnique(sans)
 	for _, s := range sans {
 		if ip := net.ParseIP(s); ip != nil {
 			template.IPAddresses = append(template.IPAddresses, ip)
@@ -105,7 +106,11 @@ func LocalSANs() []string {
 	return localSANs[:]
 }
 
-var localSANs = []string{"127.0.0.1", "::1", "localhost"}
+var localSANs = []string{
+	"localhost",
+	"127.0.0.1",
+	"::1",
+}
 
 // notBeforeOrAfter returns a deterministic start and end date for a TLS
 // certificate. Given that certificates are accepted by browsers with a max
@@ -132,4 +137,17 @@ func (z zeroes) Read(p []byte) (n int, err error) {
 		p[i] = 0
 	}
 	return len(p), nil
+}
+
+func sortUnique(strs []string) []string {
+	uniq := make(map[string]struct{}, len(strs))
+	for _, s := range strs {
+		uniq[s] = struct{}{}
+	}
+	out := make([]string, 0, len(uniq))
+	for s := range uniq {
+		out = append(out, s)
+	}
+	sort.Strings(out)
+	return out
 }
