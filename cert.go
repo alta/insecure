@@ -3,6 +3,7 @@ package insecure
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
@@ -10,6 +11,7 @@ import (
 	"fmt"
 	"math/big"
 	"net"
+	"sort"
 	"time"
 )
 
@@ -64,6 +66,8 @@ func PEM(sans ...string) (cert []byte, key []byte, err error) {
 		BasicConstraintsValid: true,
 	}
 
+	hash := sha256.New()
+
 	if len(sans) == 0 {
 		sans = LocalSANs()
 	}
@@ -74,7 +78,10 @@ func PEM(sans ...string) (cert []byte, key []byte, err error) {
 		} else {
 			template.DNSNames = append(template.DNSNames, s)
 		}
+		hash.Write([]byte(s))
 	}
+
+	template.SerialNumber = big.NewInt(0).SetBytes(hash.Sum(nil))
 
 	// For deterministic output. Do NOT do this for any real server.
 	b, err := x509.CreateCertificate(zeroes{}, &template, &template, priv.Public(), priv)

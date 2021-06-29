@@ -21,8 +21,8 @@ func TestPEM(t *testing.T) {
 		wantSHA   string
 		wantErr   bool
 	}{
-		{"computer.local", []string{"computer.local"}, []string{"computer.local"}, "9221e5433fcef4cfa917a793f1112465d9344402784230b3459d64ea13a83222", false},
-		{"local SANs + computer.local", append(LocalSANs(), "computer.local"), append(LocalSANs(), "computer.local"), "c770a0201f509803b12e19383a814a3ba0c578c8b38bc6575ae2216c63414dc4", false},
+		{"computer.local", []string{"computer.local"}, []string{"computer.local"}, "b97d0a3f24678008fd5f643be80afbf61b9c0758ca4a93bacd0e1fc7d03ef122", false},
+		{"local SANs + computer.local", append(LocalSANs(), "computer.local"), append(LocalSANs(), "computer.local"), "26ce8b2f862a624adb777bbf184be1560d25af612a8d0da97b0744a04dc44d7b", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
