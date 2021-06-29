@@ -17,7 +17,7 @@ import (
 
 func TestUnsigned(t *testing.T) {
 	caRoot := os.Getenv("CAROOT")
-	os.Setenv("CAROOT", ".")
+	os.Setenv("CAROOT", "testdata/certs/unsigned")
 	defer func() {
 		os.Setenv("CAROOT", caRoot)
 	}()
@@ -77,9 +77,15 @@ func TestUnsigned(t *testing.T) {
 }
 
 func TestSigned(t *testing.T) {
+	caRoot := os.Getenv("CAROOT")
+	os.Setenv("CAROOT", "testdata/certs/mkcert")
+	defer func() {
+		os.Setenv("CAROOT", caRoot)
+	}()
+
 	caCert, _, err := CA()
 	if err != nil {
-		cmd := exec.Command("mkcert", "-install")
+		cmd := exec.Command("mkcert")
 		err := cmd.Run()
 		if err != nil {
 			t.Fatal(err)
