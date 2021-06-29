@@ -1,6 +1,7 @@
 package insecure
 
 import (
+	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/sha256"
@@ -54,7 +55,7 @@ func PEM(sans ...string) (cert []byte, key []byte, err error) {
 
 	notBefore, notAfter := notBeforeOrAfter(time.Now())
 
-	template := x509.Certificate{
+	template := &x509.Certificate{
 		SerialNumber: big.NewInt(SerialNumber),
 		Subject: pkix.Name{
 			Organization: []string{Organization},
@@ -83,8 +84,16 @@ func PEM(sans ...string) (cert []byte, key []byte, err error) {
 
 	template.SerialNumber = big.NewInt(0).SetBytes(hash.Sum(nil))
 
-	// For deterministic output. Do NOT do this for any real server.
-	b, err := x509.CreateCertificate(zeroes{}, &template, &template, priv.Public(), priv)
+	// Get CA, if present.
+	parent := template
+	signKey := crypto.PrivateKey(priv)
+	caCert, caKey, err := CA()
+	if err == nil && caCert != nil && caKey != nil {
+		parent = caCert
+		signKey = caKey
+	}
+
+	b, err := x509.CreateCertificate(zeroes{}, template, parent, priv.Public(), signKey)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create certificate: %s", err)
 	}

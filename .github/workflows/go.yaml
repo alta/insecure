@@ -22,16 +22,22 @@ jobs:
         with:
           go-version: ^1
 
+      - name: Install tools
+        run: brew install mkcert staticcheck
+
       - name: Vet
         run: go vet ./...
 
+      - name: Staticcheck
+        run: staticcheck ./...
+
       - name: Test
-        run: go test -mod=readonly -v -race ./...
+        run: go test -v -race ./...
 
       - name: Test without cgo
         env:
           CGO_ENABLED: 0
-        run: go test -mod=readonly -v ./...
+        run: go test -v ./...
 
       - name: Verify repo is unchanged
         run: git diff --exit-code HEAD -w -G'(^[^# /])|(^#\w)|(^\s+[^#/])' # Ignore whitespace and comments

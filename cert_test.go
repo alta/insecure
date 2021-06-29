@@ -9,11 +9,19 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"os/exec"
 	"testing"
 	"time"
 )
 
-func TestPEM(t *testing.T) {
+func TestUnsigned(t *testing.T) {
+	caRoot := os.Getenv("CAROOT")
+	os.Setenv("CAROOT", "testdata/certs/unsigned")
+	defer func() {
+		os.Setenv("CAROOT", caRoot)
+	}()
+
 	tests := []struct {
 		name      string
 		sans      []string
@@ -42,6 +50,70 @@ func TestPEM(t *testing.T) {
 			ok := roots.AppendCertsFromPEM(certPEM)
 			if !ok {
 				panic("failed to parse root certificate")
+			}
+
+			block, _ := pem.Decode(certPEM)
+			if block == nil {
+				t.Fatal("failed to parse certificate PEM")
+			}
+			cert, err := x509.ParseCertificate(block.Bytes)
+			if err != nil {
+				t.Fatalf("failed to parse certificate: " + err.Error())
+			}
+
+			// Verify certificate is valid for all expected names
+			for _, name := range tt.wantNames {
+				opts := x509.VerifyOptions{
+					DNSName: name,
+					Roots:   roots,
+				}
+
+				if _, err := cert.Verify(opts); err != nil {
+					t.Errorf("failed to verify certificate: " + err.Error())
+				}
+			}
+		})
+	}
+}
+
+func TestSigned(t *testing.T) {
+	caRoot := os.Getenv("CAROOT")
+	os.Setenv("CAROOT", "testdata/certs/mkcert")
+	defer func() {
+		os.Setenv("CAROOT", caRoot)
+	}()
+
+	caCert, _, err := CA()
+	if err != nil {
+		cmd := exec.Command("mkcert")
+		err := cmd.Run()
+		if err != nil {
+			t.Fatal(err)
+		}
+		caCert, _, err = CA()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	roots := x509.NewCertPool()
+	roots.AddCert(caCert)
+
+	tests := []struct {
+		name      string
+		sans      []string
+		wantNames []string
+		wantErr   bool
+	}{
+		{"computer.local", []string{"computer.local"}, []string{"computer.local"}, false},
+		{"local SANs + computer.local", append(LocalSANs(), "computer.local"), append(LocalSANs(), "computer.local"), false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			certPEM, _, err := PEM(tt.sans...)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("PEM() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
 
 			block, _ := pem.Decode(certPEM)
