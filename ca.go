@@ -41,7 +41,7 @@ func CA() (cert *x509.Certificate, key crypto.PrivateKey, err error) {
 
 	keyDERBlock, _ := pem.Decode(keyPEMBlock)
 	if keyDERBlock == nil || keyDERBlock.Type != "PRIVATE KEY" {
-		return nil, nil, errors.New("ERROR: failed to read the CA key: unexpected content")
+		return nil, nil, errors.New("failed to read the CA key: unexpected content")
 	}
 	key, err = x509.ParsePKCS8PrivateKey(keyDERBlock.Bytes)
 	if err != nil {
