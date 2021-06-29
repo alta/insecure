@@ -84,6 +84,10 @@ func TestSigned(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		caCert, _, err = CA()
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	roots := x509.NewCertPool()
