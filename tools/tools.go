@@ -1,6 +1,6 @@
 // +build tools
 
-package insecure
+package tools
 
 import (
 	// Blank imports for tool binaries
