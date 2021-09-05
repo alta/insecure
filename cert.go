@@ -126,6 +126,7 @@ var localSANs = []string{
 	"localhost",
 	"127.0.0.1",
 	"::1",
+	"0.0.0.0",
 }
 
 // notBeforeOrAfter returns a deterministic start and end date for a TLS
@@ -134,8 +135,9 @@ var localSANs = []string{
 // and add 398 days to get the end date. The current time (now) should always
 // fall between the two dates.
 func notBeforeOrAfter(now time.Time) (time.Time, time.Time) {
-	notBefore := time.Date(now.UTC().Year(), 1, 1, 0, 0, 0, 0, time.UTC)
-	notAfter := notBefore.Add(398 * 24 * time.Hour)
+	now = now.UTC()
+	notBefore := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+	notAfter := notBefore.Add(14 * 24 * time.Hour)
 	return notBefore, notAfter
 }
 
