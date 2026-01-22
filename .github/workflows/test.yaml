@@ -25,8 +25,11 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: Install mkcert CA in system trust store
-        run: go tool filippo.io/mkcert -install
+      # - name: Install mkcert CA in system trust store
+      #   run: go tool filippo.io/mkcert -install
+
+      - name: Look for CA cert
+        run: ls testdata/certs/mkcert
 
       - name: Vet
         run: go vet ./...
