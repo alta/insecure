@@ -85,7 +85,7 @@ func TestSigned(t *testing.T) {
 
 	caCert, _, err := CA()
 	if err != nil {
-		cmd := exec.Command("mkcert")
+		cmd := exec.Command("go", "tool", "filippo.io/mkcert")
 		err := cmd.Run()
 		if err != nil {
 			t.Fatal(err)
