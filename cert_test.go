@@ -58,7 +58,7 @@ func TestUnsigned(t *testing.T) {
 			}
 			cert, err := x509.ParseCertificate(block.Bytes)
 			if err != nil {
-				t.Fatalf("failed to parse certificate: " + err.Error())
+				t.Fatalf("failed to parse certificate: %s", err.Error())
 			}
 
 			// Verify certificate is valid for all expected names
@@ -69,7 +69,7 @@ func TestUnsigned(t *testing.T) {
 				}
 
 				if _, err := cert.Verify(opts); err != nil {
-					t.Errorf("failed to verify certificate: " + err.Error())
+					t.Errorf("failed to verify certificate: %s", err.Error())
 				}
 			}
 		})
@@ -122,7 +122,7 @@ func TestSigned(t *testing.T) {
 			}
 			cert, err := x509.ParseCertificate(block.Bytes)
 			if err != nil {
-				t.Fatalf("failed to parse certificate: " + err.Error())
+				t.Fatalf("failed to parse certificate: %s", err.Error())
 			}
 
 			// Verify certificate is valid for all expected names
@@ -133,7 +133,7 @@ func TestSigned(t *testing.T) {
 				}
 
 				if _, err := cert.Verify(opts); err != nil {
-					t.Errorf("failed to verify certificate: " + err.Error())
+					t.Errorf("failed to verify certificate: %s", err.Error())
 				}
 			}
 		})
