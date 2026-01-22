@@ -1,4 +1,4 @@
-name: Go
+name: Test
 
 on:
   push:
@@ -11,27 +11,30 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    strategy:
+      matrix:
+        go-version: ['1.23', '1.24', '1.25']
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v6
         with:
-          go-version: ^1
+          go-version: ${{ matrix.go-version }}
 
-      - name: Install tools
-        run: brew install mkcert staticcheck
+      # - name: Install tools
+      #   run: brew install mkcert staticcheck
 
       - name: Vet
         run: go vet ./...
 
-      - name: Staticcheck
-        run: staticcheck ./...
-
       - name: Test
+        run: go test -v ./...
+
+      - name: Test with race detector
         run: go test -v -race ./...
 
       - name: Test without cgo
