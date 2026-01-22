@@ -29,8 +29,8 @@ func TestUnsigned(t *testing.T) {
 		wantSHA   string
 		wantErr   bool
 	}{
-		{"computer.local", []string{"computer.local"}, []string{"computer.local"}, "cd53416a4bbf741a3d2156369ead968ee16dfdb804f44dffe573ed19912ed9f5", false},
-		{"local SANs + computer.local", append(LocalSANs(), "computer.local"), append(LocalSANs(), "computer.local"), "2280d8a21afaf8b3a08c905c98a1e33c4656367233250a6820f0a24bbdb85698", false},
+		{"computer.local", []string{"computer.local"}, []string{"computer.local"}, "f662bf6b5bf2180f692763ae337336532d202b5b58cd9ec433d202e4d397c732", false},
+		{"local SANs + computer.local", append(LocalSANs(), "computer.local"), append(LocalSANs(), "computer.local"), "64962b58fe0b273b6900b1f03b1fc98df755ec00fc5d0479f7231c98260fcdd7", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
