@@ -6,7 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -29,8 +29,8 @@ func TestUnsigned(t *testing.T) {
 		wantSHA   string
 		wantErr   bool
 	}{
-		{"computer.local", []string{"computer.local"}, []string{"computer.local"}, "cd53416a4bbf741a3d2156369ead968ee16dfdb804f44dffe573ed19912ed9f5", false},
-		{"local SANs + computer.local", append(LocalSANs(), "computer.local"), append(LocalSANs(), "computer.local"), "2280d8a21afaf8b3a08c905c98a1e33c4656367233250a6820f0a24bbdb85698", false},
+		{"computer.local", []string{"computer.local"}, []string{"computer.local"}, "6fc67759f0c2d5e5b21c510ebfe3485c07f7fd3d3d2fb398a26fe4a174599ccf", false},
+		{"local SANs + computer.local", append(LocalSANs(), "computer.local"), append(LocalSANs(), "computer.local"), "bd697fd807f73b6e30699469f6e2ddbbf34520082a9d7b2c5bd6fa0692d6520c", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -58,7 +58,7 @@ func TestUnsigned(t *testing.T) {
 			}
 			cert, err := x509.ParseCertificate(block.Bytes)
 			if err != nil {
-				t.Fatalf("failed to parse certificate: " + err.Error())
+				t.Fatalf("failed to parse certificate: %s", err.Error())
 			}
 
 			// Verify certificate is valid for all expected names
@@ -69,7 +69,7 @@ func TestUnsigned(t *testing.T) {
 				}
 
 				if _, err := cert.Verify(opts); err != nil {
-					t.Errorf("failed to verify certificate: " + err.Error())
+					t.Errorf("failed to verify certificate: %s", err.Error())
 				}
 			}
 		})
@@ -85,7 +85,7 @@ func TestSigned(t *testing.T) {
 
 	caCert, _, err := CA()
 	if err != nil {
-		cmd := exec.Command("mkcert")
+		cmd := exec.Command("go", "tool", "filippo.io/mkcert", "-install")
 		err := cmd.Run()
 		if err != nil {
 			t.Fatal(err)
@@ -122,7 +122,7 @@ func TestSigned(t *testing.T) {
 			}
 			cert, err := x509.ParseCertificate(block.Bytes)
 			if err != nil {
-				t.Fatalf("failed to parse certificate: " + err.Error())
+				t.Fatalf("failed to parse certificate: %s", err.Error())
 			}
 
 			// Verify certificate is valid for all expected names
@@ -133,7 +133,7 @@ func TestSigned(t *testing.T) {
 				}
 
 				if _, err := cert.Verify(opts); err != nil {
-					t.Errorf("failed to verify certificate: " + err.Error())
+					t.Errorf("failed to verify certificate: %s", err.Error())
 				}
 			}
 		})
@@ -179,7 +179,7 @@ func TestServeCert(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatal(err)
 	}

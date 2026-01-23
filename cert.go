@@ -93,7 +93,7 @@ func PEM(sans ...string) (cert []byte, key []byte, err error) {
 		signKey = caKey
 	}
 
-	b, err := x509.CreateCertificate(zeroes{}, template, parent, priv.Public(), signKey)
+	b, err := x509.CreateCertificate(ones{}, template, parent, priv.Public(), signKey)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create certificate: %s", err)
 	}
@@ -144,15 +144,15 @@ func notBeforeOrAfter(now time.Time) (time.Time, time.Time) {
 // Key returns a P-256 ECDSA private key generated WITHOUT randomess.
 func Key() (priv *ecdsa.PrivateKey, err error) {
 	curve := elliptic.P256()
-	return ecdsa.GenerateKey(curve, zeroes{})
+	return ecdsa.GenerateKey(curve, ones{})
 }
 
 // For deterministic output. Do NOT do this for any real server.
-type zeroes struct{}
+type ones struct{}
 
-func (z zeroes) Read(p []byte) (n int, err error) {
+func (ones) Read(p []byte) (n int, err error) {
 	for i := range p {
-		p[i] = 0
+		p[i] = 1
 	}
 	return len(p), nil
 }

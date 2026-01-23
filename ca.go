@@ -6,7 +6,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -60,7 +59,7 @@ func CAPEM() (cert []byte, key []byte, err error) {
 	if !pathExists(caPath) {
 		return nil, nil, fmt.Errorf("no CA certificate located at: %s", caPath)
 	}
-	cert, err = ioutil.ReadFile(caPath)
+	cert, err = os.ReadFile(caPath)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -69,7 +68,7 @@ func CAPEM() (cert []byte, key []byte, err error) {
 	if !pathExists(keyPath) {
 		return nil, nil, fmt.Errorf("no CA key located at: %s", keyPath)
 	}
-	key, err = ioutil.ReadFile(keyPath)
+	key, err = os.ReadFile(keyPath)
 	if err != nil {
 		return nil, nil, err
 	}
