@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"testing"
 	"time"
 )
@@ -84,7 +85,15 @@ func TestSigned(t *testing.T) {
 
 	caCert, _, err := CA()
 	if err != nil {
-		t.Fatal(err)
+		cmd := exec.Command("go", "tool", "filippo.io/mkcert", "-install")
+		err := cmd.Run()
+		if err != nil {
+			t.Fatal(err)
+		}
+		caCert, _, err = CA()
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	roots := x509.NewCertPool()
