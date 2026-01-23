@@ -28,8 +28,8 @@ jobs:
       # - name: Install mkcert CA in system trust store
       #   run: go tool filippo.io/mkcert -install
 
-      - name: Look for CA cert
-        run: ls testdata/certs/mkcert
+      - name: Debug
+        run: pwd && ls -alR
 
       - name: Vet
         run: go vet ./...
